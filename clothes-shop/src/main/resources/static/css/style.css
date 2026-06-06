@@ -1,0 +1,56 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Hiệu ứng phóng to ảnh nhẹ khi di chuột vào sản phẩm giống các trang web lớn */
+.product-card img {
+    transition: transform 0.5s ease;
+}
+
+.product-card:hover img {
+    transform: scale(1.06);
+}
+
+.product-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    cursor: pointer;
+}
+/* Hiệu ứng tự động hiển thị dropdown khi di chuột qua (Hover) giống các shop lớn */
+@media (min-width: 992px) {
+    .navbar-nav .nav-item.dropdown:hover .dropdown-menu {
+        display: block;
+        margin-top: 0;
+        animation: fadeInSlide 0.25s ease forwards;
+    }
+}
+
+/* Hiệu ứng chuyển động mượt mà cho menu */
+@keyframes fadeInSlide {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Đổi màu chữ khi rê chuột vào các item trong menu con */
+.dropdown-menu .dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #dc3545 !important; /* Đổi sang màu đỏ thương hiệu khi hover */
+    padding-left: 20px;
+    transition: all 0.2s ease;
+}
+
+.hover-icon:hover {
+    color: #dc3545 !important;
+    transition: color 0.2s ease;
+}

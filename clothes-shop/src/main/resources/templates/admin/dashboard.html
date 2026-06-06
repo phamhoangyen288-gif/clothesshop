@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Clothes Shop</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        :root {
+            --bg: #f5f7fb;
+            --panel: #ffffff;
+            --dark: #111827;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --brand: #2563eb;
+            --brand-soft: #dbeafe;
+            --green: #16a34a;
+            --orange: #f97316;
+            --red: #dc2626;
+            --shadow: 0 12px 35px rgba(15, 23, 42, .08);
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--bg); color: var(--dark); font-family: Arial, sans-serif; }
+        .admin-layout { display: flex; min-height: 100vh; }
+        .sidebar { width: 255px; background: #0f172a; color: white; padding: 24px 18px; position: sticky; top: 0; height: 100vh; }
+        .brand { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 800; margin-bottom: 30px; }
+        .brand-logo { width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; background: linear-gradient(135deg, #2563eb, #7c3aed); }
+        .nav-title { font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: .08em; margin: 24px 10px 10px; }
+        .nav-link { display: flex; align-items: center; gap: 10px; color: #cbd5e1; text-decoration: none; padding: 12px 14px; border-radius: 14px; margin-bottom: 8px; font-weight: 700; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,.1); color: white; }
+        .content { flex: 1; padding: 28px; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; }
+        .topbar h1 { margin: 0; font-size: 28px; }
+        .topbar p { color: var(--muted); margin: 7px 0 0; }
+        .btn { border: 0; border-radius: 12px; padding: 11px 16px; font-weight: 800; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: var(--brand); color: white; }
+        .btn-light { background: white; color: var(--dark); border: 1px solid var(--border); }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap: 18px; margin-bottom: 22px; }
+        .stat-card { background: var(--panel); padding: 20px; border-radius: 22px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+        .stat-card .label { color: var(--muted); font-size: 14px; margin-bottom: 10px; }
+        .stat-card .value { font-size: 28px; font-weight: 900; }
+        .stat-card .hint { margin-top: 8px; font-size: 13px; color: var(--muted); }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .panel { background: var(--panel); border-radius: 22px; padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); overflow: hidden; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .panel h2 { font-size: 18px; margin: 0; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 13px 10px; border-bottom: 1px solid var(--border); text-align: left; font-size: 14px; vertical-align: middle; }
+        th { color: var(--muted); font-size: 13px; background: #f8fafc; }
+        tr:last-child td { border-bottom: 0; }
+        .badge { display: inline-block; padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 800; }
+        .badge-green { background: #dcfce7; color: #166534; }
+        .badge-blue { background: var(--brand-soft); color: #1d4ed8; }
+        .badge-orange { background: #ffedd5; color: #9a3412; }
+        .badge-red { background: #fee2e2; color: #991b1b; }
+        .empty { color: var(--muted); padding: 14px 0; }
+        @media (max-width: 1050px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } .grid-2 { grid-template-columns: 1fr; } .sidebar { display: none; } }
+        @media (max-width: 640px) { .content { padding: 16px; } .stats-grid { grid-template-columns: 1fr; } .topbar { align-items: flex-start; flex-direction: column; } }
+    </style>
+</head>
+<body>
+<div class="admin-layout">
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-logo">CS</div>
+            <div>Clothes Shop</div>
+        </div>
+
+        <div class="nav-title">Quản trị</div>
+        <a class="nav-link active" th:href="@{/admin/dashboard}">📊 Thống kê tổng hợp</a>
+        <a class="nav-link" th:href="@{/admin/products}">👕 Quản lý mặt hàng</a>
+        <a class="nav-link" th:href="@{/}">🏠 Về trang khách hàng</a>
+
+        <div class="nav-title">Tài khoản</div>
+        <a class="nav-link" th:href="@{/logout}">🚪 Đăng xuất</a>
+    </aside>
+
+    <main class="content">
+        <div class="topbar">
+            <div>
+                <h1>Thống kê tổng hợp</h1>
+                <p>Theo dõi sản phẩm, tồn kho, đơn hàng và doanh thu của cửa hàng.</p>
+            </div>
+            <a class="btn btn-primary" th:href="@{/admin/products/create}">+ Thêm mặt hàng</a>
+        </div>
+
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="label">Danh mục</div>
+                <div class="value" th:text="${stats['totalCategories']}">0</div>
+                <div class="hint">Tổng số danh mục</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Sản phẩm</div>
+                <div class="value" th:text="${stats['totalProducts']}">0</div>
+                <div class="hint"><span th:text="${stats['activeProducts']}">0</span> đang bán · <span th:text="${stats['inactiveProducts']}">0</span> đã ẩn</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Tồn kho</div>
+                <div class="value" th:text="${stats['totalStock']}">0</div>
+                <div class="hint"><span th:text="${stats['totalVariants']}">0</span> biến thể</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Doanh thu hoàn thành</div>
+                <div class="value" th:text="${#numbers.formatDecimal(stats['totalRevenue'], 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</div>
+                <div class="hint"><span th:text="${stats['totalOrders']}">0</span> đơn hàng</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Tài khoản</div>
+                <div class="value" th:text="${stats['totalUsers']}">0</div>
+                <div class="hint"><span th:text="${stats['totalCustomers']}">0</span> khách hàng</div>
+            </div>
+        </section>
+
+        <section class="grid-2">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Đơn hàng theo trạng thái</h2>
+                </div>
+                <table th:if="${!#lists.isEmpty(orderStatusStats)}">
+                    <thead>
+                    <tr>
+                        <th>Trạng thái</th>
+                        <th>Số đơn</th>
+                        <th>Tổng tiền</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="row : ${orderStatusStats}">
+                        <td><span class="badge badge-blue" th:text="${row['status']}">PENDING</span></td>
+                        <td th:text="${row['quantity']}">0</td>
+                        <td th:text="${#numbers.formatDecimal(row['total_amount'], 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="empty" th:if="${#lists.isEmpty(orderStatusStats)}">Chưa có đơn hàng.</div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Sản phẩm theo danh mục</h2>
+                </div>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Danh mục</th>
+                        <th>Số sản phẩm</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="row : ${productByCategory}">
+                        <td th:text="${row['name']}">Áo thun</td>
+                        <td th:text="${row['quantity']}">0</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="grid-2">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Biến thể sắp hết hàng</h2>
+                </div>
+                <table th:if="${!#lists.isEmpty(lowStockProducts)}">
+                    <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th>Size</th>
+                        <th>Màu</th>
+                        <th>Tồn</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="row : ${lowStockProducts}">
+                        <td th:text="${row['product_name']}">Tên sản phẩm</td>
+                        <td th:text="${row['size']}">M</td>
+                        <td th:text="${row['color']}">Đen</td>
+                        <td><span class="badge badge-red" th:text="${row['stock_quantity']}">0</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="empty" th:if="${#lists.isEmpty(lowStockProducts)}">Không có sản phẩm sắp hết hàng.</div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Top sản phẩm bán chạy</h2>
+                </div>
+                <table th:if="${!#lists.isEmpty(topSellingProducts)}">
+                    <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th>Đã bán</th>
+                        <th>Doanh số</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="row : ${topSellingProducts}">
+                        <td th:text="${row['product_name']}">Tên sản phẩm</td>
+                        <td th:text="${row['sold_quantity']}">0</td>
+                        <td th:text="${#numbers.formatDecimal(row['total_money'], 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="empty" th:if="${#lists.isEmpty(topSellingProducts)}">Chưa có dữ liệu bán hàng.</div>
+            </div>
+        </section>
+
+        <section class="grid-2">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Doanh thu theo tháng</h2>
+                </div>
+                <table th:if="${!#lists.isEmpty(revenueByMonth)}">
+                    <thead>
+                    <tr>
+                        <th>Tháng</th>
+                        <th>Số đơn</th>
+                        <th>Doanh thu</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="row : ${revenueByMonth}">
+                        <td th:text="|Tháng ${row['month_value']}/${row['year_value']}|">Tháng 1/2026</td>
+                        <td th:text="${row['order_count']}">0</td>
+                        <td th:text="${#numbers.formatDecimal(row['revenue'], 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="empty" th:if="${#lists.isEmpty(revenueByMonth)}">Chưa có đơn hoàn thành nên doanh thu đang bằng 0.</div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Đơn hàng gần đây</h2>
+                </div>
+                <table th:if="${!#lists.isEmpty(recentOrders)}">
+                    <thead>
+                    <tr>
+                        <th>Mã</th>
+                        <th>Khách hàng</th>
+                        <th>Trạng thái</th>
+                        <th>Tổng tiền</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="row : ${recentOrders}">
+                        <td th:text="${row['id']}">1</td>
+                        <td th:text="${row['full_name']}">Nguyễn Văn A</td>
+                        <td><span class="badge badge-orange" th:text="${row['status']}">PENDING</span></td>
+                        <td th:text="${#numbers.formatDecimal(row['total_amount'], 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="empty" th:if="${#lists.isEmpty(recentOrders)}">Chưa có đơn hàng.</div>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

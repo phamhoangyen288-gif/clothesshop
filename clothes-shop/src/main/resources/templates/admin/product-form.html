@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${formTitle} + ' - Clothes Shop'">Form mặt hàng</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        :root {
+            --bg: #f5f7fb;
+            --panel: #ffffff;
+            --dark: #111827;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --brand: #2563eb;
+            --shadow: 0 12px 35px rgba(15, 23, 42, .08);
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--bg); color: var(--dark); font-family: Arial, sans-serif; }
+        .admin-layout { display: flex; min-height: 100vh; }
+        .sidebar { width: 255px; background: #0f172a; color: white; padding: 24px 18px; position: sticky; top: 0; height: 100vh; }
+        .brand { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 800; margin-bottom: 30px; }
+        .brand-logo { width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; background: linear-gradient(135deg, #2563eb, #7c3aed); }
+        .nav-title { font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: .08em; margin: 24px 10px 10px; }
+        .nav-link { display: flex; align-items: center; gap: 10px; color: #cbd5e1; text-decoration: none; padding: 12px 14px; border-radius: 14px; margin-bottom: 8px; font-weight: 700; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,.1); color: white; }
+        .content { flex: 1; padding: 28px; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 22px; }
+        .topbar h1 { margin: 0; font-size: 28px; }
+        .topbar p { color: var(--muted); margin: 7px 0 0; }
+        .panel { background: var(--panel); border-radius: 22px; padding: 24px; box-shadow: var(--shadow); border: 1px solid var(--border); max-width: 900px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group.full { grid-column: 1 / -1; }
+        label { font-weight: 800; font-size: 14px; }
+        input, select, textarea { width: 100%; border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; outline: none; font-size: 15px; background: white; }
+        textarea { min-height: 120px; resize: vertical; }
+        input:focus, select:focus, textarea:focus { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(37, 99, 235, .12); }
+        .actions { display: flex; gap: 12px; margin-top: 22px; flex-wrap: wrap; }
+        .btn { border: 0; border-radius: 12px; padding: 11px 16px; font-weight: 800; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background: var(--brand); color: white; }
+        .btn-light { background: white; color: var(--dark); border: 1px solid var(--border); }
+        .alert { padding: 14px 16px; border-radius: 14px; margin-bottom: 16px; font-weight: 700; background: #fee2e2; color: #991b1b; }
+        input[type="file"] { padding: 10px; cursor: pointer; }
+        .upload-box { border: 1px dashed #cbd5e1; border-radius: 16px; padding: 14px; background: #f8fafc; }
+        .upload-hint { color: var(--muted); font-size: 13px; margin-top: 8px; line-height: 1.5; }
+        .image-preview { margin-top: 14px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .image-preview img { width: 140px; height: 140px; object-fit: cover; border-radius: 16px; border: 1px solid var(--border); background: white; }
+        .old-image { color: var(--muted); font-size: 13px; word-break: break-all; }
+        @media (max-width: 900px) { .sidebar { display: none; } .content { padding: 18px; } .form-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="admin-layout">
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-logo">CS</div>
+            <div>Clothes Shop</div>
+        </div>
+
+        <div class="nav-title">Quản trị</div>
+        <a class="nav-link" th:href="@{/admin/dashboard}">📊 Thống kê tổng hợp</a>
+        <a class="nav-link active" th:href="@{/admin/products}">👕 Quản lý mặt hàng</a>
+        <a class="nav-link" th:href="@{/}">🏠 Về trang khách hàng</a>
+
+        <div class="nav-title">Tài khoản</div>
+        <a class="nav-link" th:href="@{/logout}">🚪 Đăng xuất</a>
+    </aside>
+
+    <main class="content">
+        <div class="topbar">
+            <div>
+                <h1 th:text="${formTitle}">Thêm mặt hàng</h1>
+                <p>Nhập thông tin sản phẩm theo đúng dữ liệu bảng products.</p>
+            </div>
+            <a class="btn btn-light" th:href="@{/admin/products}">← Quay lại</a>
+        </div>
+
+        <div class="alert" th:if="${error}" th:text="${error}"></div>
+
+        <section class="panel">
+            <form th:action="@{/admin/products/save}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="id" th:value="${product['id']}">
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="categoryId">Danh mục</label>
+                        <select id="categoryId" name="categoryId" required>
+                            <option value="">-- Chọn danh mục --</option>
+                            <option th:each="c : ${categories}"
+                                    th:value="${c['id']}"
+                                    th:text="${c['name']}"
+                                    th:selected="${product['category_id'] != null and product['category_id'].toString().equals(c['id'].toString())}">
+                                Áo thun
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">Trạng thái</label>
+                        <select id="status" name="status" required>
+                            <option value="ACTIVE" th:selected="${product['status'] == null || product['status'] == 'ACTIVE'}">Đang bán</option>
+                            <option value="INACTIVE" th:selected="${product['status'] == 'INACTIVE'}">Đã ẩn</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="name">Tên mặt hàng</label>
+                        <input id="name" type="text" name="name" th:value="${product['name']}" required maxlength="255" placeholder="Ví dụ: Áo thun basic cotton">
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="description">Mô tả</label>
+                        <textarea id="description" name="description" th:text="${product['description']}" placeholder="Nhập mô tả sản phẩm..."></textarea>
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="imageFile">Ảnh mặt hàng</label>
+                        <div class="upload-box">
+                            <input type="hidden" name="existingMainImage" th:value="${product['main_image']}">
+                            <input id="imageFile" type="file" name="imageFile" accept="image/*" onchange="previewImage(event)">
+
+                            <div class="upload-hint">
+                                Chọn ảnh từ máy tính. Hỗ trợ JPG, JPEG, PNG, GIF, WEBP.
+                                Khi sửa sản phẩm, nếu không chọn ảnh mới thì hệ thống giữ ảnh cũ.
+                            </div>
+
+                            <div class="image-preview">
+                                <img id="preview"
+                                     th:if="${product['main_image'] != null and #strings.startsWith(product['main_image'], '/uploads/')}"
+                                     th:src="${product['main_image']}"
+                                     alt="Ảnh sản phẩm">
+                                <img id="preview"
+                                     th:unless="${product['main_image'] != null and #strings.startsWith(product['main_image'], '/uploads/')}"
+                                     style="display:none"
+                                     alt="Ảnh xem trước">
+                                <div class="old-image" th:if="${product['main_image'] != null}">
+                                    Ảnh hiện tại: <span th:text="${product['main_image']}">image.jpg</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="originalPrice">Giá gốc</label>
+                        <input id="originalPrice" type="number" name="originalPrice" min="0" step="1000" th:value="${product['original_price']}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="salePrice">Giá khuyến mãi</label>
+                        <input id="salePrice" type="number" name="salePrice" min="0" step="1000" th:value="${product['sale_price']}" placeholder="Có thể bỏ trống">
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-primary" type="submit">Lưu mặt hàng</button>
+                    <a class="btn btn-light" th:href="@{/admin/products}">Hủy</a>
+                </div>
+            </form>
+        </section>
+    </main>
+</div>
+<script>
+    function previewImage(event) {
+        const file = event.target.files[0];
+        const preview = document.getElementById('preview');
+        if (!file || !preview) {
+            return;
+        }
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = 'block';
+    }
+</script>
+</body>
+</html>

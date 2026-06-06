@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${product.name}"></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body class="bg-light">
+<div class="container my-5 bg-white p-5 rounded shadow-sm">
+    <div class="row">
+        <!-- 1. Hiển thị ảnh chính (Đã chuẩn mainImage) -->
+        <div class="col-md-6">
+            <img th:src="@{'/images/' + ${product.mainImage}}" class="img-fluid rounded shadow-sm" alt="Ảnh sản phẩm">
+        </div>
+        <div class="col-md-6">
+            <!-- 2. Hiển thị danh mục thuộc tính đối tượng Java -->
+            <span class="badge bg-secondary mb-2" th:text="${product.category != null ? product.category.name : 'Chưa phân loại'}">Danh mục</span>
+            <h1 class="fw-bold h2 mb-3" th:text="${product.name}">Tên sản phẩm</h1>
+
+            <!-- 3. ĐÃ SỬA: Đổi sale_price và original_price thành salePrice và originalPrice đúng chuẩn CamelCase -->
+            <h3 class="text-danger fw-bold mb-4"
+                th:text="${#numbers.formatDecimal(product.salePrice != null ? product.salePrice : product.originalPrice, 0, 'COMMA', 0, 'POINT') + 'đ'}">Giá</h3>
+
+            <p class="text-muted" th:text="${product.description}">Mô tả</p>
+
+            <form action="/cart/add" method="POST" class="mt-4">
+                <input type="hidden" name="productId" th:value="${product.id}">
+
+                <div class="mb-3">
+                    <label class="fw-bold d-block mb-2">Chọn Size & Màu sắc:</label>
+                    <div class="btn-group flex-wrap" role="group">
+                        <!-- 4. ĐÃ SỬA: Đổi product.productDetails thành product.variants để khớp với List<ProductVariant> trong Java -->
+                        <th:block th:each="var : ${product.variants}">
+                            <input type="radio" class="btn-check" name="variantId" th:id="'size-' + ${var.id}" th:value="${var.id}" required>
+                            <!-- 5. ĐÃ SỬA: Đổi var.stock_quantity thành var.stockQuantity đúng chuẩn CamelCase -->
+                            <label class="btn btn-outline-dark me-2 mb-2 px-3 rounded" th:for="'size-' + ${var.id}"
+                                   th:text="${var.size} + ' - ' + ${var.color} + ' (Kho: ' + ${var.stockQuantity} + ')'"></label>
+                        </th:block>
+                    </div>
+                </div>
+
+                <div class="mb-4 style-w" style="max-width: 120px;">
+                    <label class="fw-bold mb-2">Số lượng:</label>
+                    <input type="number" name="quantity" class="form-control" value="1" min="1" required>
+                </div>
+
+                <button type="submit" class="btn btn-danger btn-lg w-100 rounded-pill fw-bold py-3">
+                    <i class="fa-solid fa-cart-plus me-2"></i> Thêm Vào Giỏ Hàng
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sản Phẩm - ClothesShop</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="bg-light">
+
+<div th:replace="~{fragments/navbar :: header}"></div>
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-sm p-4 sticky-top" style="top: 110px; z-index: 10;">
+                <h5 class="fw-bold mb-3"><i class="fa-solid fa-filter text-danger me-2"></i>Danh Mục</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item px-0" th:each="category : ${listCategories}">
+                        <a th:href="@{/products(category=${category.name == 'Áo Thun' ? 'ao-thun' :
+                                                         (category.name == 'Áo Polo' ? 'ao-polo' :
+                                                         (category.name == 'Áo Sơ Mi' ? 'ao-so-mi' :
+                                                         (category.name == 'Quần Jean' ? 'quan-jean' :
+                                                         (category.name == 'Quần Short' ? 'quan-short' :
+                                                         (category.name == 'Thắt Lưng' ? 'that-lung' :
+                                                         (category.name == 'Ví Da' ? 'vi-da' : 'tre-em'))))))})}"
+                           class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+                            <span th:text="${category.name}">Tên danh mục</span>
+                            <span class="badge bg-secondary rounded-pill" th:text="${category.products != null ? category.products.size() : 0}">0</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="card border-0 shadow-sm p-4 mb-4 bg-white">
+                <h4 class="fw-bold text-dark mb-0" th:text="${pageTitle}">Kết Quả Lọc Sản Phẩm</h4>
+            </div>
+
+            <div th:if="${listProducts != null && !listProducts.isEmpty()}" class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="col" th:each="product : ${listProducts}">
+                    <div class="card h-100 border-0 shadow-sm product-card bg-white rounded-3 overflow-hidden">
+                        <div class="position-relative overflow-hidden" style="height: 280px;">
+                            <img th:src="@{'/images/' + ${product.mainImage}}"
+                                 class="w-100 h-100 object-fit-cover" alt="Ảnh sản phẩm">
+                        </div>
+
+                        <div class="card-body p-3">
+                            <span class="badge bg-light text-secondary mb-2" th:text="${product.category != null ? product.category.name : 'Chưa phân loại'}">Danh mục</span>
+                            <a th:href="@{/product/detail/{id}(id=${product.id})}" class="text-decoration-none text-dark">
+                                <h6 class="card-title fw-bold mb-2 text-truncate" th:text="${product.name}">Tên sản phẩm</h6>
+                            </a>
+
+                            <div class="d-flex align-items-center justify-content-between mt-3">
+                                <span class="text-danger fw-bold fs-5"
+                                      th:text="${#numbers.formatDecimal(product.salePrice != null ? product.salePrice : product.originalPrice, 0, 'COMMA', 0, 'POINT') + 'đ'}">0đ</span>
+
+                                <a th:href="@{/product/detail/{id}(id=${product.id})}" class="btn btn-danger btn-sm rounded-pill px-3 fw-semibold">
+                                    Xem Chi Tiết
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${listProducts == null || listProducts.isEmpty()}" class="alert alert-warning text-center py-4 rounded-3 border-0 shadow-sm" style="background-color: #fff3cd; color: #664d03;">
+                <h5 class="mb-0 fw-semibold">
+                    <i class="fa-solid fa-face-frown me-2 text-warning fs-4"></i>
+                    Hệ thống hiện chưa có sản phẩm nào thuộc bộ sưu tập hoặc phân loại này!
+                </h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

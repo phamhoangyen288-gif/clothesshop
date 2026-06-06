@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <title>Navigation Bar</title>
+</head>
+<body>
+<div th:fragment="header">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white pt-3 pb-2 shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-3 text-dark me-4" th:href="@{/}">CLOTHES<span class="text-danger">SHOP</span></a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-bold text-uppercase" style="font-size: 0.85rem; gap: 10px;">
+                    <li class="nav-item"><a class="nav-link text-dark" th:href="@{/}">Trang Chủ</a></li>
+                    <li class="nav-item"><a class="nav-link text-dark" th:href="@{/products(filter='new')}">Sản Phẩm Mới</a></li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">Khuyến Mãi</a>
+                        <ul class="dropdown-menu border-0 shadow-sm rounded-3">
+                            <li><a class="dropdown-item small" th:href="@{/products(filter='sale')}">Đồng giá 195k</a></li>
+                            <li><a class="dropdown-item small" th:href="@{/products(filter='sale20')}">Xả kho -20%</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">Collection</a>
+                        <ul class="dropdown-menu border-0 shadow-sm rounded-3">
+                            <li><a class="dropdown-item small py-2" th:href="@{/products(collection='cloudrunner')}">Cloudrunner Collection</a></li>
+                            <li><a class="dropdown-item small py-2" th:href="@{/products(collection='travellers')}">Travellers Selection</a></li>
+                            <li><a class="dropdown-item small py-2" th:href="@{/products(collection='travelling')}">Travelling Collection</a></li>
+                            <li><a class="dropdown-item small py-2" th:href="@{/products(collection='tet')}">Tết Collection</a></li>
+                            <li><a class="dropdown-item small py-2" th:href="@{/products(collection='jeans')}">Deep Black Premium Jeans</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">Áo Nam</a>
+                        <ul class="dropdown-menu border-0 shadow-sm rounded-3">
+                            <li><a class="dropdown-item small" th:href="@{/products(category='ao-thun')}">Áo Thun Cổ Tròn</a></li>
+                            <li><a class="dropdown-item small" th:href="@{/products(category='ao-polo')}">Áo Polo Hiện Đại</a></li>
+                            <li><a class="dropdown-item small" th:href="@{/products(category='ao-so-mi')}">Áo Sơ Mi</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">Quần Nam</a>
+                        <ul class="dropdown-menu border-0 shadow-sm rounded-3">
+                            <li><a class="dropdown-item small" th:href="@{/products(category='quan-jean')}">Quần Jean Suông</a></li>
+                            <li><a class="dropdown-item small" th:href="@{/products(category='quan-short')}">Quần Short Năng Động</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">Phụ Kiện</a>
+                        <ul class="dropdown-menu border-0 shadow-sm rounded-3">
+                            <li><a class="dropdown-item small" th:href="@{/products(category='that-lung')}">Thắt Lưng</a></li>
+                            <li><a class="dropdown-item small" th:href="@{/products(category='vi-da')}">Ví Da</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item"><a class="nav-link text-dark" th:href="@{/products(category='tre-em')}">Trẻ Em</a></li>
+                </ul>
+
+                <div class="d-flex align-items-center gap-3">
+                    <form class="d-flex" th:action="@{/products}" method="GET">
+                        <div class="input-group input-group-sm" style="max-width: 220px;">
+                            <input class="form-control border-end-0 rounded-start-pill px-3 bg-light" type="search" name="keyword" th:value="${keyword}" placeholder="Tìm quần áo...">
+                            <button class="btn btn-light border-start-0 text-muted bg-light rounded-end-pill" type="submit">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="d-flex align-items-center gap-3 fs-5 position-relative">
+                        <a th:if="${session.currentUser != null}" th:href="@{/profile}" class="text-dark hover-icon" title="Trang cá nhân">
+                            <i class="fa-solid fa-user-check text-danger"></i>
+                        </a>
+
+                        <a th:if="${session.currentUser == null}" th:href="@{/login}" class="text-dark hover-icon" title="Đăng nhập">
+                            <i class="fa-regular fa-user"></i>
+                        </a>
+                        <a th:if="${session.currentUser != null}" th:href="@{/profile}" class="text-dark hover-icon me-2" title="Trang cá nhân">
+                            <i class="fa-solid fa-user-check text-danger"></i>
+                        </a>
+
+                        <a th:if="${session.currentUser != null}" th:href="@{/logout}" class="text-muted text-decoration-none small fw-bold hover-icon" title="Đăng xuất" style="font-size: 0.75rem;">
+                            <i class="fa-solid fa-right-from-bracket me-1"></i>Đăng xuất
+                        </a>
+                        <a th:href="@{/cart}" class="text-dark position-relative hover-icon">
+                            <i class="fa-solid fa-bag-shopping"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                  style="font-size: 0.6rem; padding: 0.25em 0.4em;"
+                                  th:text="${session.cart != null ? session.cart.size() : 0}">0</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="bg-white border-top border-bottom py-2 text-center">
+        <div class="container d-flex justify-content-center">
+            <div class="dropdown fw-bold text-uppercase" style="font-size: 0.8rem;">
+                <a class="text-decoration-none text-secondary dropdown-toggle" href="#" id="navbarRecruitment" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Tuyển Dụng
+                </a>
+                <ul class="dropdown-menu border-0 shadow-sm text-center" aria-labelledby="navbarRecruitment">
+                    <li><a class="dropdown-item small py-2" th:href="@{/recruitment/sales}">Tuyển Nhân Viên Bán Hàng</a></li>
+                    <li><a class="dropdown-item small py-2" th:href="@{/recruitment/designer}">Tuyển Designer Thời Trang</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
