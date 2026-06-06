@@ -9,6 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDetail {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,7 +22,30 @@ public class OrderDetail {
     @JoinColumn(name = "variant_id", nullable = false)
     private ProductVariant productVariant;
 
+    @Column(nullable = false)
     private Integer quantity;
 
-    private Double price; // Lưu giá tại thời điểm mua phòng trường hợp sau này đổi giá sản phẩm
+    @Column(name = "price_at_order_time", nullable = false)
+    private Double priceAtOrderTime;
+
+    @Column(nullable = false)
+    private Double subtotal;
+
+    public void setPrice(Double price) {
+        this.priceAtOrderTime = price;
+        if (this.quantity != null && price != null) {
+            this.subtotal = price * this.quantity;
+        }
+    }
+
+    public Double getPrice() {
+        return this.priceAtOrderTime;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+        if (this.priceAtOrderTime != null && quantity != null) {
+            this.subtotal = this.priceAtOrderTime * quantity;
+        }
+    }
 }

@@ -1,56 +1,123 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${product.name}"></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${product.name} + ' - Clothes Shop'">Chi tiết sản phẩm</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body { background: #f6f7fb; }
+        .product-shell { padding: 42px 0 64px; }
+        .product-card { background: white; border-radius: 28px; box-shadow: 0 22px 55px rgba(15, 23, 42, .08); overflow: hidden; }
+        .product-img-wrap { background: linear-gradient(135deg, #f8fafc, #fff1f2); min-height: 540px; display: flex; align-items: center; justify-content: center; padding: 28px; }
+        .product-img { max-height: 500px; width: 100%; object-fit: contain; border-radius: 24px; }
+        .product-info { padding: 40px; }
+        .price { color: #dc3545; font-size: 2rem; font-weight: 900; }
+        .old-price { text-decoration: line-through; color: #94a3b8; font-weight: 600; }
+        .variant-label { border-radius: 16px !important; padding: 11px 14px !important; font-weight: 700; }
+        .variant-label small { font-weight: 600; }
+        .qty-box { max-width: 150px; }
+        .btn-cart { border-radius: 999px; min-height: 54px; font-weight: 900; letter-spacing: .2px; }
+        .meta-box { background: #f8fafc; border-radius: 20px; padding: 18px; }
+        .breadcrumb a { color: #6b7280; text-decoration: none; }
+        @media (max-width: 768px) { .product-img-wrap { min-height: 330px; } .product-info { padding: 26px; } }
+    </style>
 </head>
-<body class="bg-light">
-<div class="container my-5 bg-white p-5 rounded shadow-sm">
-    <div class="row">
-        <!-- 1. Hiển thị ảnh chính (Đã chuẩn mainImage) -->
-        <div class="col-md-6">
-            <img th:src="@{'/images/' + ${product.mainImage}}" class="img-fluid rounded shadow-sm" alt="Ảnh sản phẩm">
-        </div>
-        <div class="col-md-6">
-            <!-- 2. Hiển thị danh mục thuộc tính đối tượng Java -->
-            <span class="badge bg-secondary mb-2" th:text="${product.category != null ? product.category.name : 'Chưa phân loại'}">Danh mục</span>
-            <h1 class="fw-bold h2 mb-3" th:text="${product.name}">Tên sản phẩm</h1>
+<body>
+<div th:replace="~{fragments/navbar :: header}"></div>
 
-            <!-- 3. ĐÃ SỬA: Đổi sale_price và original_price thành salePrice và originalPrice đúng chuẩn CamelCase -->
-            <h3 class="text-danger fw-bold mb-4"
-                th:text="${#numbers.formatDecimal(product.salePrice != null ? product.salePrice : product.originalPrice, 0, 'COMMA', 0, 'POINT') + 'đ'}">Giá</h3>
+<main class="product-shell">
+    <div class="container">
+        <nav class="breadcrumb small mb-3">
+            <a th:href="@{/}">Trang chủ</a>
+            <span class="mx-2">/</span>
+            <a th:href="@{/products}">Sản phẩm</a>
+            <span class="mx-2">/</span>
+            <span class="text-muted" th:text="${product.name}">Chi tiết</span>
+        </nav>
 
-            <p class="text-muted" th:text="${product.description}">Mô tả</p>
+        <div th:if="${error}" class="alert alert-danger border-0 rounded-4" th:text="${error}"></div>
+        <div th:if="${success}" class="alert alert-success border-0 rounded-4" th:text="${success}"></div>
 
-            <form action="/cart/add" method="POST" class="mt-4">
-                <input type="hidden" name="productId" th:value="${product.id}">
-
-                <div class="mb-3">
-                    <label class="fw-bold d-block mb-2">Chọn Size & Màu sắc:</label>
-                    <div class="btn-group flex-wrap" role="group">
-                        <!-- 4. ĐÃ SỬA: Đổi product.productDetails thành product.variants để khớp với List<ProductVariant> trong Java -->
-                        <th:block th:each="var : ${product.variants}">
-                            <input type="radio" class="btn-check" name="variantId" th:id="'size-' + ${var.id}" th:value="${var.id}" required>
-                            <!-- 5. ĐÃ SỬA: Đổi var.stock_quantity thành var.stockQuantity đúng chuẩn CamelCase -->
-                            <label class="btn btn-outline-dark me-2 mb-2 px-3 rounded" th:for="'size-' + ${var.id}"
-                                   th:text="${var.size} + ' - ' + ${var.color} + ' (Kho: ' + ${var.stockQuantity} + ')'"></label>
-                        </th:block>
+        <section class="product-card">
+            <div class="row g-0">
+                <div class="col-lg-6">
+                    <div class="product-img-wrap">
+                        <img class="product-img"
+                             th:src="${product.mainImage != null and #strings.startsWith(product.mainImage, '/') ? product.mainImage : '/images/' + product.mainImage}"
+                             onerror="this.src='https://placehold.co/600x600?text=No+Image'"
+                             alt="Ảnh sản phẩm">
                     </div>
                 </div>
 
-                <div class="mb-4 style-w" style="max-width: 120px;">
-                    <label class="fw-bold mb-2">Số lượng:</label>
-                    <input type="number" name="quantity" class="form-control" value="1" min="1" required>
-                </div>
+                <div class="col-lg-6">
+                    <div class="product-info">
+                        <span class="badge rounded-pill bg-dark mb-3 px-3 py-2"
+                              th:text="${product.category != null ? product.category.name : 'Chưa phân loại'}">Danh mục</span>
 
-                <button type="submit" class="btn btn-danger btn-lg w-100 rounded-pill fw-bold py-3">
-                    <i class="fa-solid fa-cart-plus me-2"></i> Thêm Vào Giỏ Hàng
-                </button>
-            </form>
-        </div>
+                        <h1 class="fw-bold mb-3" th:text="${product.name}">Tên sản phẩm</h1>
+                        <p class="text-muted mb-4" th:text="${product.description != null ? product.description : 'Sản phẩm chưa có mô tả.'}">Mô tả</p>
+
+                        <div class="d-flex align-items-end gap-3 mb-4 flex-wrap">
+                            <div class="price"
+                                 th:text="${#numbers.formatDecimal(product.salePrice != null ? product.salePrice : product.originalPrice, 0, 'COMMA', 0, 'POINT') + 'đ'}">0đ</div>
+                            <div class="old-price mb-2" th:if="${product.salePrice != null}"
+                                 th:text="${#numbers.formatDecimal(product.originalPrice, 0, 'COMMA', 0, 'POINT') + 'đ'}">0đ</div>
+                        </div>
+
+                        <form th:action="@{/cart/add}" method="post">
+                            <input type="hidden" name="productId" th:value="${product.id}">
+
+                            <div class="mb-4">
+                                <label class="fw-bold d-block mb-3">Chọn size và màu sắc</label>
+
+                                <div class="d-flex flex-wrap gap-2" th:if="${product.variants != null and !#lists.isEmpty(product.variants)}">
+                                    <th:block th:each="var : ${product.variants}">
+                                        <input type="radio" class="btn-check" name="variantId"
+                                               th:id="'variant-' + ${var.id}" th:value="${var.id}"
+                                               th:disabled="${var.stockQuantity <= 0}" required>
+                                        <label class="btn btn-outline-dark variant-label" th:for="'variant-' + ${var.id}">
+                                            <span th:text="${var.size} + ' / ' + ${var.color}">M / Đen</span><br>
+                                            <small th:classappend="${var.stockQuantity <= 0 ? 'text-danger' : 'text-muted'}"
+                                                   th:text="${var.stockQuantity <= 0 ? 'Hết hàng' : 'Còn ' + var.stockQuantity + ' sản phẩm'}">Còn hàng</small>
+                                        </label>
+                                    </th:block>
+                                </div>
+
+                                <div class="alert alert-warning border-0 rounded-4" th:if="${product.variants == null or #lists.isEmpty(product.variants)}">
+                                    Sản phẩm này chưa có biến thể size/màu để thêm vào giỏ.
+                                </div>
+                            </div>
+
+                            <div class="row g-3 align-items-end mb-4">
+                                <div class="col-auto">
+                                    <label class="fw-bold mb-2">Số lượng</label>
+                                    <input type="number" name="quantity" class="form-control qty-box" value="1" min="1" required>
+                                </div>
+                                <div class="col">
+                                    <div class="meta-box d-flex gap-3 align-items-center">
+                                        <i class="fa-solid fa-truck-fast text-danger fs-4"></i>
+                                        <div>
+                                            <strong>Giao hàng nhanh</strong>
+                                            <div class="text-muted small">Kiểm tra kỹ size và màu trước khi thêm vào giỏ.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-danger btn-cart w-100"
+                                    th:disabled="${product.variants == null or #lists.isEmpty(product.variants)}">
+                                <i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ hàng
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
-</div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
